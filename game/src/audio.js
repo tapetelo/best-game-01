@@ -89,5 +89,21 @@ export function createAudio() {
     dawn() {
       [523, 659, 784, 1046].forEach((f, i) => tone(f, 1.2, 'sine', 0.12, i * 0.12));
     },
+    dash() {
+      tone(520, 0.18, 'sine', 0.1);
+      tone(760, 0.2, 'sine', 0.08, 0.05);
+    },
+    pulse() {
+      tone(220, 0.5, 'triangle', 0.12);
+      tone(330, 0.5, 'triangle', 0.1, 0.08);
+    },
+    boon() {
+      tone(659, 0.4, 'sine', 0.12);
+      tone(988, 0.5, 'sine', 0.1, 0.1);
+    },
+    boss() {
+      tone(65, 1.0, 'sawtooth', 0.14);
+      tone(98, 1.0, 'sawtooth', 0.1, 0.2);
+    },
   };
 }
