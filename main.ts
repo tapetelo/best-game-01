@@ -1,11 +1,11 @@
 // EMBERWARDEN — a best-game-01 entry (Node 22, standard library only).
 // The game is this directory's game/ folder: plain static files a desktop
-// browser loads offline (game/index.html and its ES modules, no library and
-// no network request). The warden carries the last lantern through seven
-// nights; light is both weapon and fuel. This program hands the game in: it
-// copies game/ and screenshots/ from beside this file to /output and writes
-// /output/dossier.json, the summary the judge reads, with the vendored
-// make.fun library.
+// browser loads offline (game/index.html and its ES modules, Three.js
+// vendored locally under game/vendor/three/, no network request). The warden
+// carries the last lantern through seven nights; light is both weapon and
+// fuel. This program hands the game in: it copies game/ and screenshots/
+// from beside this file to /output and writes /output/dossier.json, the
+// summary the judge reads, with the vendored make.fun library.
 //
 // Serve it locally with `node serve.ts`, then open http://localhost:8080.
 // Outside the grader's container, MAKEFUN_OUTPUT_DIR stands in for /output:
