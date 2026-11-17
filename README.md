@@ -31,8 +31,9 @@ takes you. Banish THE LONG DARK on night 7 and dawn breaks — you win.
 ## Run it
 
 Serve `game/` with any static server and open `index.html` in desktop
-Chrome. No build step, no network requests, no libraries — plain 2D canvas
-and vanilla JavaScript, with WebAudio oscillator sound only.
+Chrome. No build step, no network requests — Three.js is vendored locally
+under `game/vendor/three/`, the village renders in true 3D with WebGL, and
+the HUD is a 2D canvas overlay, with WebAudio oscillator sound only.
 
 ```sh
 node serve.ts   # then open http://localhost:8080
@@ -44,7 +45,8 @@ node serve.ts   # then open http://localhost:8080
 - `game/src/random.js` — seeded random generator
 - `game/src/input.js` — keyboard + mouse input
 - `game/src/world.js` — the night simulation (the Murk, the Beacon, lamps, embers, chain, draft, boss)
-- `game/src/render.js` — all drawing, one painter per screen
+- `game/src/render.js` — the 2D HUD overlay, one painter per screen
+- `game/src/scene3d.js` — the 3D village (Three.js, vendored locally)
 - `game/src/audio.js` — WebAudio oscillator sound
 - `game/src/shots.js` — deterministic screenshot states
 - `game/src/main.js` — boot and the game loop
