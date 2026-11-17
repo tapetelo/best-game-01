@@ -243,7 +243,7 @@ export function createRenderer(canvas) {
 
   function drawSceneBackdrop(s, t) {
     // The 3D village is behind; dim it so the menu text reads.
-    ctx.fillStyle = 'rgba(5, 7, 15, 0.5)';
+    ctx.fillStyle = 'rgba(5, 7, 15, 0.35)';
     ctx.fillRect(0, 0, FIELD.width, FIELD.height);
   }
 
