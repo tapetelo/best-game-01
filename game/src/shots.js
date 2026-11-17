@@ -32,8 +32,8 @@ export function stageShot(shot, seed) {
     s.enemies.push(fakeEnemy('douser', 150, 620));
     s.player.x = 640;
     s.player.y = 480;
-    s.best = 46975;
-    return { screen: 'title', world, time: 0.6, best: 46975 };
+    s.best = 31750;
+    return { screen: 'title', world, time: 0.6, best: 31750 };
   }
   if (shot === 'play') {
     // Night 6, mid-fight: the cover. Twenty of the Murk in four kinds plus
