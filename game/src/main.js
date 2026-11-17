@@ -23,10 +23,13 @@ import {
   SCREEN_PLAY, SCREEN_TITLE, SHOP_RECTS, TITLE_CARDS,
 } from './render.js';
 import { stageShot } from './shots.js';
+import { createScene3D } from './scene3d.js';
 
 const canvas = document.getElementById('game');
 const statusEl = document.getElementById('status');
 const renderer = createRenderer(canvas);
+const scene3d = createScene3D(document.getElementById('gl'));
+renderer.setProjector((x, y) => scene3d.project(x, y));
 const input = createInput(canvas);
 const audio = createAudio();
 
@@ -95,6 +98,7 @@ if (shot) {
   time = staged.time;
   best = Math.max(best, staged.best || 0);
   const paint = () => {
+    scene3d.update(world.state, time);
     if (screen === SCREEN_TITLE) renderer.drawTitle(world.state, best);
     else if (screen === SCREEN_PLAY) renderer.drawPlay(world.state, time, false);
     else if (screen === SCREEN_DRAFT) renderer.drawDraft(world.state);
@@ -196,6 +200,7 @@ if (shot) {
     }
     const s = world.state;
     s.best = best;
+    scene3d.update(s, time);
     if (screen === SCREEN_TITLE) renderer.drawTitle(s, best);
     else if (screen === SCREEN_PLAY) renderer.drawPlay(s, time, audio.isMuted());
     else if (screen === SCREEN_DRAFT) renderer.drawDraft(s);
