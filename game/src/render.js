@@ -738,7 +738,7 @@ export function createRenderer(canvas) {
       drawSceneBackdrop(s, 0.6);
       text(`NIGHT ${s.draft.nightDone} SURVIVED`, 640, 84, 44, PALETTE.gold);
       text(`flame ${Math.ceil(s.flame)}/${s.flameMax}  ·  score ${s.score.toLocaleString()}  ·  best chain ${s.bestChain}  ·  ◆ ${s.embers} embers`, 640, 126, 15, PALETTE.text);
-      text('Choose a boon. Two of one family wake its synergy; a pact gives much and takes something.', 640, 156, 14, PALETTE.muted);
+      text('Choose a boon. A pact gives much and takes something.', 640, 156, 14, PALETTE.muted);
       s.draft.cards.forEach((card, i) => {
         const r = DRAFT_CARDS[i];
         const isPact = card.kind === 'pact';
