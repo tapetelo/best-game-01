@@ -42,16 +42,16 @@ export function stageShot(shot, seed) {
     s.nightTime = 31;
     s.flame = 52;
     s.lives = 2;
-    s.score = 31052;
-    s.best = 41260;
-    s.embers = 420;
+    s.score = 28417;
+    s.best = 38904;
+    s.embers = 376;
     s.embersCollected = 86;
     s.embersBanked = 86;
-    s.chain = 42;
+    s.chain = 37;
     s.chainTimer = 2.4;
-    s.bestChain = 42;
+    s.bestChain = 37;
     s.chainMult = 8;
-    s.kills = 791;
+    s.kills = 683;
     s.relicsHeld = ['emberheart', 'fleetstep', 'brightwick'];
     s.incoming = { gloomite: 8, gnawer: 3, douser: 3, flicker: 3, hollow: 2, wispmother: 1 };
     s.lamps[0].lit = true;
@@ -87,11 +87,11 @@ export function stageShot(shot, seed) {
     s.nightTime = 40;
     s.flame = 100;
     s.flameMax = 100;
-    s.score = 12090;
-    s.best = 41260;
-    s.embers = 54;
-    s.embersCollected = 61;
-    s.bestChain = 30;
+    s.score = 11364;
+    s.best = 38904;
+    s.embers = 61;
+    s.embersCollected = 58;
+    s.bestChain = 27;
     s.relicsHeld = ['brightwick'];
     s.draft = {
       nightDone: 4,
@@ -109,17 +109,17 @@ export function stageShot(shot, seed) {
   s.overReason = 'Dawn breaks over the seventh night.';
   s.night = 7;
   s.nightTime = 40;
-  s.timePlayed = 351;
-  s.score = 47506;
-  s.best = 41260;
-  s.embersBanked = 441;
-  s.embersCollected = 441;
-  s.kills = 424;
-  s.bestChain = 92;
+  s.timePlayed = 377;
+  s.score = 43918;
+  s.best = 38904;
+  s.embersBanked = 402;
+  s.embersCollected = 402;
+  s.kills = 359;
+  s.bestChain = 74;
   s.chainMult = 8;
   s.lampsLit = 5;
-  s.flame = 22;
+  s.flame = 31;
   s.relicsHeld = ['emberheart', 'fleetstep', 'brightwick', 'dawnbell'];
   s.pactsHeld = ['ashentithe'];
-  return { screen: 'over', world, time: 0.6, best: 41260 };
+  return { screen: 'over', world, time: 0.6, best: 38904 };
 }
