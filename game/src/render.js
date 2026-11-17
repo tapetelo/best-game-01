@@ -5,9 +5,8 @@
 // Murk, the relics held, the chain and the four abilities at once, so the
 // frame reads at a glance even shrunk small.
 import {
-  BEACON, BOSS, DIFFICULTIES, ENEMY_TYPES, FIELD, FONT, HEDGES, HOUSES,
-  LAMPS, LAMP_LIGHT_RADIUS, LAMP_RADIUS, NIGHTS, NIGHT_INTRO, NIGHT_NAMES,
-  PALETTE, PLAYER, SHOP, TREES,
+  BOSS, DIFFICULTIES, ENEMY_TYPES, FIELD, FONT, NIGHTS, NIGHT_INTRO,
+  NIGHT_NAMES, PALETTE, SHOP,
 } from './config.js';
 
 export const SCREEN_TITLE = 'title';
@@ -42,6 +41,9 @@ export function gradeFor(score) {
 
 export function createRenderer(canvas) {
   const ctx = canvas.getContext('2d');
+  // Optional 3D projector: maps a field point to logical 1280x720 pixels,
+  // so floating score text sits over the 3D scene. Null = draw at 2D coords.
+  let project = null;
 
   function fit() {
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -93,381 +95,6 @@ export function createRenderer(canvas) {
     ctx.fill();
     text(str, x, y + 1, size, fg);
     return w;
-  }
-
-  // ---- the village -------------------------------------------------------
-  function drawGround(t) {
-    ctx.fillStyle = PALETTE.night;
-    ctx.fillRect(0, 0, FIELD.width, FIELD.height);
-    ctx.fillStyle = 'rgba(200, 210, 255, 0.45)';
-    for (let i = 0; i < 42; i++) {
-      const x = (i * 173) % FIELD.width;
-      const y = (i * 97) % 260;
-      ctx.globalAlpha = (0.3 + 0.5 * Math.abs(Math.sin(t * 0.7 + i))) * 0.7;
-      ctx.fillRect(x, y, 2, 2);
-    }
-    ctx.globalAlpha = 1;
-    // Grass.
-    ctx.fillStyle = PALETTE.grass;
-    ctx.fillRect(0, 76, FIELD.width, FIELD.height - 76);
-    // Stone paths from the Beacon to the lamps and the edges.
-    ctx.strokeStyle = PALETTE.groundPath;
-    ctx.lineWidth = 26;
-    ctx.lineCap = 'round';
-    ctx.beginPath();
-    ctx.moveTo(BEACON.x, BEACON.y);
-    ctx.lineTo(BEACON.x, 84);
-    ctx.moveTo(BEACON.x, BEACON.y);
-    ctx.lineTo(BEACON.x, 700);
-    ctx.moveTo(BEACON.x, BEACON.y);
-    ctx.lineTo(30, BEACON.y);
-    ctx.moveTo(BEACON.x, BEACON.y);
-    ctx.lineTo(1250, BEACON.y);
-    ctx.stroke();
-    ctx.strokeStyle = 'rgba(255, 200, 87, 0.12)';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(BEACON.x, BEACON.y);
-    ctx.lineTo(BEACON.x, 84);
-    ctx.moveTo(BEACON.x, BEACON.y);
-    ctx.lineTo(BEACON.x, 700);
-    ctx.stroke();
-    // Hedges.
-    for (const h of HEDGES) {
-      ctx.fillStyle = '#1d3a24';
-      ctx.beginPath();
-      ctx.roundRect(h.x, h.y, h.w, h.h, 9);
-      ctx.fill();
-      ctx.fillStyle = '#2c5232';
-      for (let i = 0; i < 5; i++) {
-        ctx.beginPath();
-        ctx.arc(h.x + 10 + i * 18, h.y + 9, 7, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    }
-    // Trees.
-    for (const tr of TREES) {
-      ctx.fillStyle = '#2a2118';
-      ctx.fillRect(tr.x - 3, tr.y, 6, 14);
-      ctx.fillStyle = '#1e4a2c';
-      ctx.beginPath();
-      ctx.arc(tr.x, tr.y - 6, 20, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = '#2c6338';
-      ctx.beginPath();
-      ctx.arc(tr.x - 8, tr.y - 12, 12, 0, Math.PI * 2);
-      ctx.arc(tr.x + 9, tr.y - 11, 11, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    // Houses with lit windows.
-    for (const h of HOUSES) {
-      ctx.fillStyle = '#232a42';
-      ctx.fillRect(h.x, h.y, h.w, h.h);
-      ctx.fillStyle = h.roof;
-      ctx.beginPath();
-      ctx.moveTo(h.x - 6, h.y);
-      ctx.lineTo(h.x + h.w / 2, h.y - 26);
-      ctx.lineTo(h.x + h.w + 6, h.y);
-      ctx.closePath();
-      ctx.fill();
-      ctx.fillStyle = 'rgba(255, 200, 110, 0.9)';
-      ctx.fillRect(h.x + 10, h.y + 14, 12, 12);
-      ctx.fillRect(h.x + h.w - 24, h.y + 14, 12, 12);
-      ctx.fillStyle = 'rgba(255, 200, 110, 0.35)';
-      ctx.beginPath();
-      ctx.arc(h.x + 16, h.y + 20, 16, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    // The Beacon plaza: a stone ring at the centre.
-    ctx.strokeStyle = '#3a4668';
-    ctx.lineWidth = 4;
-    ctx.beginPath();
-    ctx.arc(BEACON.x, BEACON.y, 62, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.strokeStyle = 'rgba(255, 200, 87, 0.25)';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.arc(BEACON.x, BEACON.y, 74, 0, Math.PI * 2);
-    ctx.stroke();
-  }
-
-  function drawBeacon(t, flame, flameMax) {
-    const flick = 1 + Math.sin(t * 9) * 0.09 + Math.sin(t * 23) * 0.04;
-    const g = ctx.createRadialGradient(BEACON.x, BEACON.y, 10, BEACON.x, BEACON.y, 240 * flick);
-    g.addColorStop(0, 'rgba(255, 190, 90, 0.5)');
-    g.addColorStop(0.45, 'rgba(255, 150, 60, 0.16)');
-    g.addColorStop(1, 'rgba(255, 150, 60, 0)');
-    ctx.fillStyle = g;
-    ctx.fillRect(BEACON.x - 250, BEACON.y - 250, 500, 500);
-    // Stone post.
-    ctx.fillStyle = '#2c3550';
-    ctx.beginPath();
-    ctx.moveTo(BEACON.x - 24, BEACON.y + 8);
-    ctx.lineTo(BEACON.x + 24, BEACON.y + 8);
-    ctx.lineTo(BEACON.x + 16, BEACON.y + 34);
-    ctx.lineTo(BEACON.x - 16, BEACON.y + 34);
-    ctx.closePath();
-    ctx.fill();
-    ctx.fillStyle = '#1c2338';
-    ctx.fillRect(BEACON.x - 30, BEACON.y - 16, 60, 26);
-    // The flame itself.
-    const fh = 26 * flick * (0.5 + 0.5 * (flame / flameMax));
-    ctx.fillStyle = PALETTE.beaconLit;
-    ctx.beginPath();
-    ctx.ellipse(BEACON.x, BEACON.y - 22, 15 * flick, fh, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = PALETTE.goldHot;
-    ctx.beginPath();
-    ctx.ellipse(BEACON.x, BEACON.y - 18, 7 * flick, fh * 0.55, 0, 0, Math.PI * 2);
-    ctx.fill();
-    // Flame label.
-    text('THE BEACON', BEACON.x, BEACON.y + 58, 13, PALETTE.gold);
-  }
-
-  function drawLamp(l, t) {
-    if (l.lit) {
-      const g = ctx.createRadialGradient(l.x, l.y, 4, l.x, l.y, LAMP_LIGHT_RADIUS);
-      g.addColorStop(0, 'rgba(255, 190, 90, 0.42)');
-      g.addColorStop(1, 'rgba(255, 150, 60, 0)');
-      ctx.fillStyle = g;
-      ctx.fillRect(l.x - LAMP_LIGHT_RADIUS, l.y - LAMP_LIGHT_RADIUS, LAMP_LIGHT_RADIUS * 2, LAMP_LIGHT_RADIUS * 2);
-    }
-    ctx.fillStyle = '#2c3550';
-    ctx.fillRect(l.x - 3, l.y - 6, 6, 26);
-    ctx.fillStyle = '#1c2338';
-    ctx.beginPath();
-    ctx.roundRect(l.x - 11, l.y - 20, 22, 16, 4);
-    ctx.fill();
-    if (l.lit) {
-      const flick = 1 + Math.sin(t * 10 + l.x) * 0.1;
-      ctx.fillStyle = PALETTE.beaconLit;
-      ctx.beginPath();
-      ctx.ellipse(l.x, l.y - 12, 6 * flick, 8 * flick, 0, 0, Math.PI * 2);
-      ctx.fill();
-    } else {
-      ctx.fillStyle = '#3a4668';
-      ctx.beginPath();
-      ctx.ellipse(l.x, l.y - 12, 6, 4, 0, 0, Math.PI * 2);
-      ctx.fill();
-      text('UNLIT', l.x, l.y - 34, 11, PALETTE.muted);
-    }
-  }
-
-  function drawGroundEmber(e, t) {
-    const bob = Math.sin(t * 3 + e.phase) * 3;
-    const g = ctx.createRadialGradient(e.x, e.y + bob, 1, e.x, e.y + bob, 20);
-    g.addColorStop(0, 'rgba(255, 154, 60, 0.9)');
-    g.addColorStop(1, 'rgba(255, 154, 60, 0)');
-    ctx.fillStyle = g;
-    ctx.beginPath();
-    ctx.arc(e.x, e.y + bob, 20, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = PALETTE.ember;
-    ctx.beginPath();
-    ctx.arc(e.x, e.y + bob, 7, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#ffd9a0';
-    ctx.beginPath();
-    ctx.arc(e.x - 2, e.y + bob - 2, 2.5, 0, Math.PI * 2);
-    ctx.fill();
-  }
-
-  function drawEnemy(e, t) {
-    const def = ENEMY_TYPES[e.type];
-    const frozen = e.frozen > 0;
-    const bob = Math.sin(t * 4 + e.wobble) * 3;
-    const x = e.x;
-    const y = e.y + bob;
-    ctx.globalAlpha = frozen ? 0.6 : 0.95;
-    const g = ctx.createRadialGradient(x, y, 2, x, y, def.radius + 12);
-    g.addColorStop(0, frozen ? 'rgba(160, 190, 255, 0.8)' : def.color + 'cc');
-    g.addColorStop(1, def.color + '00');
-    ctx.fillStyle = g;
-    ctx.beginPath();
-    ctx.arc(x, y, def.radius + 12, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = frozen ? '#aebfff' : def.color;
-    if (e.type === 'flicker') {
-      ctx.save();
-      ctx.translate(x, y);
-      ctx.rotate(Math.PI / 4);
-      ctx.fillRect(-def.radius * 0.8, -def.radius * 0.8, def.radius * 1.6, def.radius * 1.6);
-      ctx.restore();
-    } else if (e.type === 'douser') {
-      ctx.beginPath();
-      ctx.moveTo(x, y - def.radius - 6);
-      ctx.quadraticCurveTo(x + def.radius, y + 4, x, y + def.radius);
-      ctx.quadraticCurveTo(x - def.radius, y + 4, x, y - def.radius - 6);
-      ctx.fill();
-    } else {
-      ctx.beginPath();
-      ctx.arc(x, y, def.radius, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    // Gnawer teeth, Hollow shell ring, Wispmother crown.
-    if (e.type === 'gnawer') {
-      ctx.fillStyle = '#fff';
-      for (let i = -1; i <= 1; i++) {
-        ctx.beginPath();
-        ctx.moveTo(x + i * 7 - 3, y + 4);
-        ctx.lineTo(x + i * 7 + 3, y + 4);
-        ctx.lineTo(x + i * 7, y + 11);
-        ctx.closePath();
-        ctx.fill();
-      }
-    }
-    if (e.type === 'hollow' && e.shield) {
-      ctx.strokeStyle = '#e8eefc';
-      ctx.lineWidth = 2.5;
-      ctx.beginPath();
-      ctx.arc(x, y, def.radius + 5, 0, Math.PI * 2);
-      ctx.stroke();
-    }
-    if (e.type === 'wispmother') {
-      ctx.fillStyle = def.dark;
-      for (let i = -1; i <= 1; i++) {
-        ctx.beginPath();
-        ctx.moveTo(x + i * 12 - 5, y - def.radius + 4);
-        ctx.lineTo(x + i * 12, y - def.radius - 12);
-        ctx.lineTo(x + i * 12 + 5, y - def.radius + 4);
-        ctx.closePath();
-        ctx.fill();
-      }
-    }
-    // Eyes.
-    ctx.fillStyle = '#fff';
-    ctx.beginPath();
-    ctx.arc(x - 5, y - 3, 2.6, 0, Math.PI * 2);
-    ctx.arc(x + 5, y - 3, 2.6, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#10131f';
-    ctx.beginPath();
-    ctx.arc(x - 5, y - 3, 1.2, 0, Math.PI * 2);
-    ctx.arc(x + 5, y - 3, 1.2, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.globalAlpha = 1;
-    // HP pips for the tough ones.
-    if (e.maxHp > 1) {
-      for (let i = 0; i < e.maxHp; i++) {
-        ctx.fillStyle = i < e.hp ? '#ff5d5d' : '#333a52';
-        ctx.beginPath();
-        ctx.arc(x - (e.maxHp - 1) * 5 + i * 10, y - def.radius - 10, 3, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    }
-    if (frozen) text('❄', x, y - def.radius - 22, 13, '#cfe0ff');
-  }
-
-  function drawBoss(b, t) {
-    const frozen = b.frozen > 0;
-    const wob = Math.sin(t * 2) * 4;
-    const r = BOSS.radius;
-    ctx.globalAlpha = frozen ? 0.6 : 0.96;
-    const g = ctx.createRadialGradient(b.x, b.y, 6, b.x, b.y, r + 46);
-    g.addColorStop(0, frozen ? 'rgba(160, 190, 255, 0.7)' : 'rgba(90, 20, 90, 0.85)');
-    g.addColorStop(1, 'rgba(42, 10, 61, 0)');
-    ctx.fillStyle = g;
-    ctx.beginPath();
-    ctx.arc(b.x, b.y, r + 46, 0, Math.PI * 2);
-    ctx.fill();
-    // Jagged dark mass.
-    ctx.fillStyle = frozen ? '#5a6f9e' : BOSS.color;
-    ctx.beginPath();
-    for (let i = 0; i <= 12; i++) {
-      const a = (i / 12) * Math.PI * 2;
-      const rr = r + Math.sin(a * 3 + t * 2) * 7 + wob * 0.3;
-      const px = b.x + Math.cos(a) * rr;
-      const py = b.y + Math.sin(a) * rr;
-      if (i === 0) ctx.moveTo(px, py);
-      else ctx.lineTo(px, py);
-    }
-    ctx.closePath();
-    ctx.fill();
-    // Crown of spikes.
-    ctx.fillStyle = BOSS.dark;
-    for (let i = -2; i <= 2; i++) {
-      ctx.beginPath();
-      ctx.moveTo(b.x + i * 14 - 6, b.y - r + 8);
-      ctx.lineTo(b.x + i * 14, b.y - r - 16);
-      ctx.lineTo(b.x + i * 14 + 6, b.y - r + 8);
-      ctx.closePath();
-      ctx.fill();
-    }
-    // Two burning eyes.
-    ctx.fillStyle = BOSS.eye;
-    ctx.beginPath();
-    ctx.arc(b.x - 16, b.y - 6, 6, 0, Math.PI * 2);
-    ctx.arc(b.x + 16, b.y - 6, 6, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#fff';
-    ctx.beginPath();
-    ctx.arc(b.x - 16, b.y - 6, 2.2, 0, Math.PI * 2);
-    ctx.arc(b.x + 16, b.y - 6, 2.2, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.globalAlpha = 1;
-    if (frozen) text('❄', b.x, b.y - r - 28, 15, '#cfe0ff');
-  }
-
-  function drawPlayer(p, t, s) {
-    const flick = 1 + Math.sin(t * 11) * 0.06 + Math.sin(t * 23) * 0.03;
-    const r = PLAYER.lightRadius * flick;
-    const g = ctx.createRadialGradient(p.x, p.y, 10, p.x, p.y, r);
-    g.addColorStop(0, 'rgba(255, 210, 110, 0.5)');
-    g.addColorStop(0.45, 'rgba(255, 170, 70, 0.22)');
-    g.addColorStop(1, 'rgba(255, 170, 70, 0)');
-    ctx.fillStyle = g;
-    ctx.fillRect(p.x - r, p.y - r, r * 2, r * 2);
-    if (s.flareFlash > 0) {
-      ctx.save();
-      ctx.translate(p.x, p.y);
-      ctx.rotate(s.flareAngle);
-      const fg = ctx.createLinearGradient(0, 0, 330, 0);
-      fg.addColorStop(0, 'rgba(255, 240, 190, 0.8)');
-      fg.addColorStop(1, 'rgba(255, 240, 190, 0)');
-      ctx.fillStyle = fg;
-      ctx.beginPath();
-      ctx.moveTo(0, 0);
-      ctx.arc(0, 0, 330, -0.52, 0.52);
-      ctx.closePath();
-      ctx.fill();
-      ctx.restore();
-    }
-    if (s.dashTimer > 0) {
-      ctx.strokeStyle = 'rgba(255, 233, 168, 0.7)';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, 24, 0, Math.PI * 2);
-      ctx.stroke();
-    }
-    const blink = s.invulnerable > 0 && Math.floor(t * 10) % 2 === 0;
-    ctx.globalAlpha = blink ? 0.4 : 1;
-    ctx.fillStyle = '#3d2b1f';
-    ctx.beginPath();
-    ctx.arc(p.x, p.y - 4, 13, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#6b4a2f';
-    ctx.beginPath();
-    ctx.moveTo(p.x - 13, p.y - 6);
-    ctx.lineTo(p.x, p.y - 26);
-    ctx.lineTo(p.x + 13, p.y - 6);
-    ctx.closePath();
-    ctx.fill();
-    ctx.fillStyle = '#2b1e14';
-    ctx.beginPath();
-    ctx.arc(p.x, p.y + 10, 11, 0, Math.PI);
-    ctx.fill();
-    ctx.fillRect(p.x - 11, p.y + 8, 22, 12);
-    ctx.fillStyle = '#1c2338';
-    ctx.fillRect(p.x + 14, p.y - 22, 3, 10);
-    ctx.fillStyle = PALETTE.gold;
-    ctx.beginPath();
-    ctx.roundRect(p.x + 10, p.y - 34, 12, 14, 3);
-    ctx.fill();
-    ctx.fillStyle = PALETTE.goldHot;
-    ctx.beginPath();
-    ctx.arc(p.x + 16, p.y - 27, 4, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.globalAlpha = 1;
   }
 
   // ---- HUD ---------------------------------------------------------------
@@ -605,43 +232,24 @@ export function createRenderer(canvas) {
   }
 
   function drawWorld(s, t) {
-    drawGround(t);
-    for (const l of s.lamps) drawLamp(l, t);
-    drawBeacon(t, s.flame, s.flameMax);
-    for (const e of s.groundEmbers) drawGroundEmber(e, t);
-    for (const e of s.enemies) drawEnemy(e, t);
-    if (s.boss) drawBoss(s.boss, t);
-    for (const pt of s.particles) {
-      ctx.globalAlpha = Math.max(0, pt.life / pt.max);
-      ctx.fillStyle = pt.color;
-      ctx.beginPath();
-      ctx.arc(pt.x, pt.y, pt.size, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    ctx.globalAlpha = 1;
     for (const f of s.floaters) {
       ctx.globalAlpha = Math.max(0, f.life / f.max);
-      text(f.text, f.x, f.y, 15, f.color);
+      const pos = project ? project(f.x, f.y) : { x: f.x, y: f.y };
+      if (pos) text(f.text, pos.x, pos.y, 15, f.color);
     }
     ctx.globalAlpha = 1;
-    drawPlayer(s.player, t, s);
     drawHud(s, false);
   }
 
   function drawSceneBackdrop(s, t) {
-    // A staged village behind the menu screens: ground, beacon, lamps,
-    // houses and a few Murk at the edges — a real lit place, not a void.
-    drawGround(t);
-    for (const l of s.lamps) drawLamp(l, t);
-    drawBeacon(t, s.flame, s.flameMax);
-    for (const e of s.enemies) drawEnemy(e, t);
-    drawPlayer(s.player, t, s);
+    // The 3D village is behind; dim it so the menu text reads.
     ctx.fillStyle = 'rgba(5, 7, 15, 0.5)';
     ctx.fillRect(0, 0, FIELD.width, FIELD.height);
   }
 
   return {
     fit,
+    setProjector(fn) { project = fn; },
     drawTitle(s, best) {
       drawSceneBackdrop(s, 0.6);
       text('EMBERWARDEN', 640, 92, 72, PALETTE.gold);
@@ -795,11 +403,10 @@ export function createRenderer(canvas) {
         text(item.desc, r.x + r.w / 2, r.y + 42, 13, PALETTE.muted);
         text(`◆ ${item.cost}`, r.x + r.w / 2, r.y + 58, 13, afford ? PALETTE.ember : PALETTE.muted);
       });
-      text(`◆ ${s.embers} embers`, 280, 592, 16, PALETTE.ember, 'left');
+      text(`◆ ${s.embers} embers`, 170, 592, 16, PALETTE.ember, 'left');
       text('1 · 2 · 3 take a boon    4 · 5 · 6 spend embers    or click    ENTER to skip', 640, 652, 14, PALETTE.muted);
     },
     drawPaused(s) {
-      drawWorld(s, 0.6);
       ctx.fillStyle = 'rgba(5, 7, 15, 0.6)';
       ctx.fillRect(0, 0, FIELD.width, FIELD.height);
       panel(440, 260, 400, 200);
