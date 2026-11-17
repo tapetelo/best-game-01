@@ -268,7 +268,12 @@ export function createRenderer(canvas) {
     fit,
     drawTitle(best) {
       drawGround(0.6);
-      // A staged night behind the title: one lit brazier, embers, wisps held back.
+      // Warm lantern glow behind the title panel so the cover reads as a light game at a glance.
+      const glow = ctx.createRadialGradient(640, 330, 40, 640, 330, 460);
+      glow.addColorStop(0, 'rgba(255, 190, 80, 0.28)');
+      glow.addColorStop(1, 'rgba(255, 190, 80, 0)');
+      ctx.fillStyle = glow;
+      ctx.fillRect(0, 0, FIELD.width, FIELD.height);
       ctx.fillStyle = 'rgba(5, 7, 15, 0.45)';
       ctx.fillRect(0, 0, FIELD.width, FIELD.height);
       panel(240, 110, 800, 470);
@@ -278,8 +283,9 @@ export function createRenderer(canvas) {
       text('WASD / ARROWS — move      MOUSE — aim the beam', 640, 340, 20, PALETTE.text);
       text('CLICK / SPACE — flare: freeze wisps in a cone of light', 640, 372, 20, PALETTE.text);
       text('Stand by a brazier to light it  •  Gather embers to feed the lantern', 640, 404, 20, PALETTE.text);
-      text('Wisps crawl slowly in the light — flare to freeze them. Survive all 7 nights — see the dawn.', 640, 436, 20, PALETTE.text);
-      text('▶  PRESS ENTER OR CLICK TO BEGIN  •  P pause  •  M mute', 640, 500, 22, PALETTE.goldHot);
+      text('Wisps crawl slowly in the light — flare to freeze them.', 640, 436, 20, PALETTE.text);
+      text('Survive all 7 nights — see the dawn.', 640, 464, 20, PALETTE.text);
+      text('▶  PRESS ENTER OR CLICK TO BEGIN  •  P pause  •  M mute', 640, 512, 22, PALETTE.goldHot);
       if (best > 0) text(`Best run: survived to night ${best}`, 640, 540, 16, PALETTE.muted);
     },
     drawPlay(s, t, muted) {
