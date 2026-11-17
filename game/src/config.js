@@ -158,14 +158,14 @@ export const DIFFICULTIES = [
     desc: 'Fewer, softer Murk. A first watch.',
     lines: ['Murk −35%', 'Beacon harm −50%', 'Oil +30'],
     spawnMult: 0.65, speedMult: 0.9, harmMult: 0.5, scoreMult: 1, startEmbers: 30,
-    best: 24308,
+    best: 18420,
   },
   {
     key: 'standard', num: 2, name: 'Night Watch', tag: 'STANDARD',
     desc: 'The watch as Ashwick knows it.',
     lines: ['Seven nights', 'THE LONG DARK on night 7', 'Score ×1'],
     spawnMult: 1, speedMult: 1, harmMult: 1, scoreMult: 1, startEmbers: 0,
-    best: 46975,
+    best: 31750,
   },
   {
     key: 'hard', num: 3, name: 'Long Dark', tag: 'HARD',
