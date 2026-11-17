@@ -24,8 +24,11 @@ export function stageShot(shot, seed) {
     // the Murk at the edges, the warden by the Beacon.
     s.lamps[0].lit = true;
     s.lamps[1].lit = true;
+    s.lamps[2].lit = true;
+    s.lamps[3].lit = true;
     s.lamps[4].lit = true;
-    s.lampsLit = 3;
+    s.lamps[5].lit = true;
+    s.lampsLit = 6;
     s.enemies.push(fakeEnemy('gloomite', 120, 180));
     s.enemies.push(fakeEnemy('gloomite', 1160, 160));
     s.enemies.push(fakeEnemy('gnawer', 1050, 620));
